@@ -9,14 +9,14 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: [true, "Email must be unique"],
+      required: [true, "Email is required"],
       unique: true,
       trim: true,
     },
     password: {
       type: String,
-      required: true,
-      maxlength: [6, "Password must be atleast 6 character long"],
+      required: [true, "Password is required"],
+      mixlength: [6, "Password must be atleast 6 character long"],
     },
     profilePic: {
       type: String,
