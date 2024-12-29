@@ -1,7 +1,8 @@
 import AppError from "../lib/AppError.js";
 import catchAsync from "../lib/catchAsync.js";
+import cloudinary from "../lib/cloudinary.js";
 import { generateToken } from "../lib/jwtTokenAndCookie.js";
-import { loginSchema, signupSchema } from "../lib/schemas.js";
+import { loginSchema, signupSchema, updateUserSchema } from "../lib/schemas.js";
 import User from "../models/user.model.js";
 
 // signup
@@ -70,6 +71,51 @@ export const logout = catchAsync((req, res) => {
     status: "success",
     data: {
       message: "Loggged out successfully",
+    },
+  });
+});
+
+// update profile
+export const updateProfile = catchAsync(async (req, res, next) => {
+  const { success, error } = updateUserSchema.safeParse(req.body);
+  if (!success) {
+    const err = error.errors.map(error => error.message).join(". ");
+    return next(new AppError(err, 400));
+  }
+
+  const uploadedResponse = await cloudinary.uploader.upload(
+    req.body.profilePic
+  );
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      ...req.body,
+      profilePic: uploadedResponse.secure_url,
+    },
+    {
+      new: true,
+    }
+  ).select("-password");
+
+  // const { password, ...user } = updatedUser._doc;
+  re.status(201).json({
+    status: "success",
+    data: {
+      user: updatedUser,
+    },
+  });
+});
+
+// check
+export const me = catchAsync(async (req, res, next) => {
+  const me = await User.findById(req.user._id).select("-password");
+  if (!me) {
+    return new AppError("You are not logged in, please login first.", 401);
+  }
+  res.status(200).json({
+    status: "success",
+    data: {
+      user: me,
     },
   });
 });
