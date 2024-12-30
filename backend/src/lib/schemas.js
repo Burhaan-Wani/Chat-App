@@ -13,13 +13,18 @@ export const signupSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z
-    .string({ required_error: "Email is required" })
-    .email({ message: "Invalid email address" }),
-  password: z.string({ required_error: "Password is required" }),
+  email: z.string().email({ message: "Email is required" }),
+  password: z.string().min(1, { message: "Password is required" }),
 });
 
 export const updateUserSchema = z.object({
-  fullName: z.string({ required_error: "FullName is required" }),
+  fullName: z.string().min(1, { message: "FullName is required" }),
   profilePic: z.string().optional(),
+});
+
+export const messageSchema = z.object({
+  text: z
+    .string()
+    .min(1, { message: "Message must be atleast one character long" }),
+  image: z.string().optional(),
 });
