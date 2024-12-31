@@ -43,7 +43,10 @@ export const login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
   const userExists = await User.findOne({ email });
 
-  if (!userExists || !(await userExists.comparePasswords(password))) {
+  if (!userExists) {
+    return next(new AppError("User with this email does not exists", 404));
+  }
+  if (userExists && !(await userExists.comparePasswords(password))) {
     return next(new AppError("Invalid Email or Password", 401));
   }
 

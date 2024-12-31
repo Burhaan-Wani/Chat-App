@@ -5,11 +5,12 @@ import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 
 export const getUsers = catchAsync(async (req, res, next) => {
-  const loggedInUserId = req.user._id;
+  const loggedInUserId = req.user._id.toString();
 
   const filteredUsers = await User.find({
-    _id: { $ne: { loggedInUserId } },
+    _id: { $ne: loggedInUserId },
   }).select("-password");
+
   res.status(200).json({
     status: "success",
     data: {
