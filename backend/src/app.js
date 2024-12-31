@@ -1,13 +1,16 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import dotenv from "dotenv";
 
+import connectDB from "./lib/db.js";
 import authRoutes from "./routes/auth.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import { globalErrorHandlingMiddleware } from "./controllers/error.controllers.js";
 import AppError from "./lib/AppError.js";
+import { app, server } from "./socket.js";
 
-const app = express();
+dotenv.config({ path: "./config.env" });
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -31,4 +34,8 @@ app.all("*", (req, res, next) => {
 // Error Handling Middleware
 app.use(globalErrorHandlingMiddleware);
 
-export default app;
+const PORT = process.env.PORT;
+server.listen(PORT, async () => {
+  await connectDB();
+  console.log(`App is running on http://localhost:${PORT}`);
+});
